@@ -1,0 +1,727 @@
+{% extends "base.html" %}
+
+{% block title %}Client Management - Remote Access Portal{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Client Management Page Styles */
+.client-management-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--accent-primary);
+}
+
+.download-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+.download-option, .build-tool {
+    padding: 1rem;
+    background-color: var(--bg-tertiary);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 1rem;
+}
+
+.download-option h3, .build-tool h3 {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.download-option h3 svg, .build-tool h3 svg {
+    margin-right: 0.5rem;
+}
+
+.download-option p, .build-tool p {
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.build-instructions {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: var(--bg-tertiary);
+    border-radius: var(--border-radius-sm);
+}
+
+.build-instructions h3 {
+    margin-top: 0;
+    font-size: 1rem;
+}
+
+.build-instructions pre {
+    background-color: var(--bg-primary);
+    padding: 0.5rem;
+    border-radius: var(--border-radius-sm);
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--bg-tertiary);
+}
+
+.session-id {
+    display: inline-block;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2rem 0;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+}
+
+#build-console {
+    background-color: #0d0d0d;
+    border-radius: var(--border-radius-sm);
+    padding: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: #10ff00;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Progress Bar and Build Status Styles */
+.progress-bar-container {
+    height: 6px;
+    background-color: var(--bg-tertiary);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: var(--accent-primary);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.build-log {
+    background-color: #0d0d0d;
+    border-radius: var(--border-radius-sm);
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    height: 200px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    color: #10ff00;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.btn-success {
+    background-color: var(--accent-secondary);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #269d6b;
+}
+
+/* Simple Build Button Styles */
+.build-status-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(127, 90, 240, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--accent-primary);
+    animation: spin 1s ease-in-out infinite;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loader {
+    animation: spin 2s linear infinite;
+}
+
+/* Direct Build Button Styles */
+.direct-build-container {
+    text-align: center;
+    padding: 1.5rem;
+    background-color: rgba(127, 90, 240, 0.1);
+    border: 1px solid var(--accent-primary);
+    border-radius: var(--border-radius-md);
+    margin-bottom: 1.5rem;
+}
+
+.direct-build-button {
+    background-color: var(--accent-primary);
+    color: white;
+    font-size: 1.2rem;
+    padding: 0.8rem 2rem;
+    border-radius: var(--border-radius-sm);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.direct-build-button:hover {
+    background-color: #6a4cd1;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.direct-build-button svg {
+    margin-right: 0.5rem;
+    width: 1.2em;
+    height: 1.2em;
+}
+
+.direct-build-container p {
+    margin-top: 1rem;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .client-management-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Client Management</h1>
+    <p class="subtitle">Manage client applications and direct connections</p>
+</div>
+
+<div class="client-management-grid">
+    <!-- Client Downloads Section -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Client Downloads</h2>
+        </div>
+        <div class="card-content">
+            <div class="download-options">
+                <div class="download-option">
+                    <h3><i data-feather="code"></i> Python Client</h3>
+                    <p>Download the Python script to connect directly to this server.</p>
+                    <a href="{{ url_for('dashboard.download_client') }}" class="btn btn-primary">
+                        <i data-feather="download"></i> Download Script
+                    </a>
+                </div>
+                
+                <div class="download-option">
+                    <h3><i data-feather="package"></i> Client Package</h3>
+                    <p>Download a complete package with client and builder scripts.</p>
+                    <a href="{{ url_for('dashboard.download_client_package') }}" class="btn btn-primary">
+                        <i data-feather="download-cloud"></i> Download Package
+                    </a>
+                </div>
+                
+                {% if exe_exists %}
+                <div class="download-option">
+                    <h3><i data-feather="cpu"></i> Windows Executable</h3>
+                    <p>Download a pre-built Windows executable.</p>
+                    <a href="{{ url_for('dashboard.download_exe') }}" class="btn btn-primary">
+                        <i data-feather="download"></i> Download EXE
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Build Tools Section -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Build Tools</h2>
+        </div>
+        <div class="card-content">
+            {% if pyinstaller_installed and current_user.is_admin %}
+            
+            <!-- New Direct Build & Download Button -->
+            <div class="direct-build-container">
+                <button id="direct-build-button" class="direct-build-button">
+                    <i data-feather="package"></i> Build & Download Windows EXE
+                </button>
+                <p>Single-click solution to build and download the client executable</p>
+                
+                <div id="direct-build-status" style="display: none; margin-top: 20px;">
+                    <div class="build-status-container">
+                        <p id="direct-status-text">Preparing to build...</p>
+                        <div class="spinner"></div>
+                    </div>
+                    
+                    <div class="progress-bar-container">
+                        <div id="direct-progress-bar" class="progress-bar"></div>
+                    </div>
+                    
+                    <div id="direct-build-output" class="build-log">
+                        <p>Initializing build process...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Simple Build EXE Button -->
+            <div class="build-tool">
+                <h3><i data-feather="package"></i> Simple EXE Builder</h3>
+                <p>One-click solution to build the Windows client executable.</p>
+                
+                <button id="simple-build-btn" class="btn btn-primary">
+                    <i data-feather="tool"></i> Build Windows EXE
+                </button>
+                
+                <div id="simple-build-status" style="display: none; margin-top: 15px;">
+                    <div class="build-status-container">
+                        <p id="build-status-text">Building...</p>
+                        <div class="spinner"></div>
+                    </div>
+                    
+                    <div class="progress-bar-container">
+                        <div id="simple-progress-bar" class="progress-bar"></div>
+                    </div>
+                    
+                    <div id="simple-build-output" class="build-log">
+                        <p>Starting build process...</p>
+                    </div>
+                    
+                    <div id="download-container" style="display: none; margin-top: 15px; text-align: center;">
+                        <a id="download-link" href="#" class="btn btn-success">
+                            <i data-feather="download"></i> Download EXE
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="build-tool">
+                <h3><i data-feather="tool"></i> Client Builder</h3>
+                <p>Download the builder script to create executables on your own machine.</p>
+                <a href="{{ url_for('dashboard.download_builder') }}" class="btn">
+                    <i data-feather="download"></i> Download Builder
+                </a>
+            </div>
+            {% elif not pyinstaller_installed and current_user.is_admin %}
+            <div class="build-tool">
+                <h3><i data-feather="package"></i> Build Executable</h3>
+                <p>PyInstaller is not installed on the server. Install it to build executables here.</p>
+                <code>pip install pyinstaller</code>
+            </div>
+            {% endif %}
+            
+            <div class="build-instructions">
+                <h3>Usage Instructions</h3>
+                <p>To use the Python client directly:</p>
+                <pre><code>python remote_client.py {{ request.host.split(':')[0] }} {{ request.host.split(':')[1] if ':' in request.host else '5000' }}</code></pre>
+                
+                <p>To build an executable:</p>
+                <pre><code>python build_exe.py</code></pre>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Active Clients Section -->
+    <div class="card full-width">
+        <div class="card-header">
+            <h2>Active Direct Connections</h2>
+            <button id="refresh-clients-btn" class="btn">
+                <i data-feather="refresh-cw"></i> Refresh
+            </button>
+        </div>
+        <div class="card-content">
+            <div class="active-clients-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Session ID</th>
+                            <th>IP Address</th>
+                            <th>Connected Since</th>
+                            <th>Duration</th>
+                            <th>Data Transferred</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="active-clients-table">
+                        {% if active_clients %}
+                            {% for client in active_clients %}
+                            <tr>
+                                <td><span class="session-id">{{ client.session_id }}</span></td>
+                                <td>{{ client.ip_address }}</td>
+                                <td>{{ client.connected_since }}</td>
+                                <td>{{ client.duration }}</td>
+                                <td>{{ client.data_transferred }} bytes</td>
+                                <td>
+                                    <form action="{{ url_for('remote.disconnect', session_id=client.session_id) }}" method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i data-feather="power"></i> Disconnect
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="empty-state">No active direct connections</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize feather icons
+        feather.replace();
+        
+        // Direct Build & Download Button
+        const directBuildBtn = document.getElementById('direct-build-button');
+        const directBuildStatus = document.getElementById('direct-build-status');
+        const directBuildOutput = document.getElementById('direct-build-output');
+        const directProgressBar = document.getElementById('direct-progress-bar');
+        const directStatusText = document.getElementById('direct-status-text');
+        
+        if (directBuildBtn) {
+            directBuildBtn.addEventListener('click', function() {
+                // Disable button and show status
+                directBuildBtn.disabled = true;
+                directBuildStatus.style.display = 'block';
+                directBuildOutput.innerHTML = '<p>Starting build process...</p>';
+                directProgressBar.style.width = '0%';
+                
+                // Start build process with automatic download
+                fetch('{{ url_for("dashboard.direct_build_and_download") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => {
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    
+                    function processStream() {
+                        return reader.read().then(({ done, value }) => {
+                            if (done) {
+                                return;
+                            }
+                            
+                            // Decode and process the chunk
+                            const chunk = decoder.decode(value, { stream: true });
+                            
+                            // Process the chunk line by line
+                            const lines = chunk.split('\n');
+                            lines.forEach(line => {
+                                if (!line.trim()) return;
+                                
+                                try {
+                                    // Try to parse as JSON
+                                    const data = JSON.parse(line);
+                                    
+                                    if (data.type === 'progress') {
+                                        // Update progress
+                                        directProgressBar.style.width = data.progress + '%';
+                                        directStatusText.textContent = data.message || 'Building...';
+                                    }
+                                    else if (data.type === 'log') {
+                                        // Add log message
+                                        const logLine = document.createElement('p');
+                                        logLine.textContent = data.message;
+                                        directBuildOutput.appendChild(logLine);
+                                        directBuildOutput.scrollTop = directBuildOutput.scrollHeight;
+                                    }
+                                    else if (data.type === 'download') {
+                                        // Trigger download
+                                        directStatusText.textContent = 'Build completed! Starting download...';
+                                        directProgressBar.style.width = '100%';
+                                        
+                                        // Create an invisible iframe for download
+                                        const iframe = document.createElement('iframe');
+                                        iframe.style.display = 'none';
+                                        iframe.src = data.download_url;
+                                        document.body.appendChild(iframe);
+                                        
+                                        // Add log message
+                                        const logLine = document.createElement('p');
+                                        logLine.textContent = 'Build successful! Downloading executable...';
+                                        logLine.style.color = '#2cb67d';
+                                        directBuildOutput.appendChild(logLine);
+                                        
+                                        // Re-enable button after delay
+                                        setTimeout(() => {
+                                            directBuildBtn.disabled = false;
+                                            directStatusText.textContent = 'Build and download completed!';
+                                        }, 3000);
+                                    }
+                                    else if (data.type === 'error') {
+                                        // Show error
+                                        const errorLine = document.createElement('p');
+                                        errorLine.textContent = 'ERROR: ' + data.message;
+                                        errorLine.style.color = '#e53170';
+                                        directBuildOutput.appendChild(errorLine);
+                                        
+                                        // Re-enable button
+                                        directBuildBtn.disabled = false;
+                                        directStatusText.textContent = 'Build failed';
+                                    }
+                                } catch (e) {
+                                    // Not JSON, treat as regular log output
+                                    const logLine = document.createElement('p');
+                                    logLine.textContent = line;
+                                    directBuildOutput.appendChild(logLine);
+                                }
+                            });
+                            
+                            // Auto-scroll to bottom
+                            directBuildOutput.scrollTop = directBuildOutput.scrollHeight;
+                            
+                            // Continue reading
+                            return processStream();
+                        });
+                    }
+                    
+                    return processStream();
+                })
+                .catch(error => {
+                    console.error('Error during build:', error);
+                    
+                    // Show error in log
+                    const errorLine = document.createElement('p');
+                    errorLine.textContent = 'ERROR: ' + error.message;
+                    errorLine.style.color = '#e53170';
+                    directBuildOutput.appendChild(errorLine);
+                    
+                    // Update status and re-enable button
+                    directStatusText.textContent = 'Build failed';
+                    directBuildBtn.disabled = false;
+                });
+            });
+        }
+        
+        // Simple Build EXE Button (existing code)
+        const simpleBuildBtn = document.getElementById('simple-build-btn');
+        const buildStatus = document.getElementById('simple-build-status');
+        const buildOutput = document.getElementById('simple-build-output');
+        const progressBar = document.getElementById('simple-progress-bar');
+        const statusText = document.getElementById('build-status-text');
+        const downloadContainer = document.getElementById('download-container');
+        const downloadLink = document.getElementById('download-link');
+        
+        if (simpleBuildBtn) {
+            simpleBuildBtn.addEventListener('click', function() {
+                // Disable button and show status
+                simpleBuildBtn.disabled = true;
+                buildStatus.style.display = 'block';
+                buildOutput.innerHTML = '<p>Initializing build process...</p>';
+                progressBar.style.width = '0%';
+                downloadContainer.style.display = 'none';
+                
+                // Start build process
+                fetch('{{ url_for("dashboard.simple_build_exe") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => {
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    
+                    function processStream() {
+                        return reader.read().then(({ done, value }) => {
+                            if (done) {
+                                return;
+                            }
+                            
+                            // Decode and process the chunk
+                            const chunk = decoder.decode(value, { stream: true });
+                            
+                            try {
+                                // Try to parse as JSON (for progress updates)
+                                const data = JSON.parse(chunk);
+                                
+                                if (data.type === 'progress') {
+                                    // Update progress bar
+                                    progressBar.style.width = data.progress + '%';
+                                    statusText.textContent = data.message || 'Building...';
+                                }
+                                else if (data.type === 'complete') {
+                                    // Build complete
+                                    progressBar.style.width = '100%';
+                                    statusText.textContent = 'Build completed!';
+                                    
+                                    // Show download link
+                                    downloadContainer.style.display = 'block';
+                                    downloadLink.href = data.download_url;
+                                    
+                                    // Re-enable button
+                                    simpleBuildBtn.disabled = false;
+                                    
+                                    // Refresh icons
+                                    feather.replace();
+                                }
+                                else if (data.type === 'log') {
+                                    // Append to log
+                                    const logLine = document.createElement('p');
+                                    logLine.textContent = data.message;
+                                    buildOutput.appendChild(logLine);
+                                    buildOutput.scrollTop = buildOutput.scrollHeight;
+                                }
+                                else if (data.type === 'error') {
+                                    // Show error
+                                    const errorLine = document.createElement('p');
+                                    errorLine.textContent = 'ERROR: ' + data.message;
+                                    errorLine.style.color = '#e53170';
+                                    buildOutput.appendChild(errorLine);
+                                    
+                                    // Re-enable button
+                                    simpleBuildBtn.disabled = false;
+                                    statusText.textContent = 'Build failed';
+                                }
+                            } catch (e) {
+                                // Not JSON, treat as regular log output
+                                const logLine = document.createElement('p');
+                                logLine.textContent = chunk;
+                                buildOutput.appendChild(logLine);
+                                buildOutput.scrollTop = buildOutput.scrollHeight;
+                            }
+                            
+                            // Continue reading
+                            return processStream();
+                        });
+                    }
+                    
+                    return processStream();
+                })
+                .catch(error => {
+                    console.error('Error during build:', error);
+                    buildOutput.innerHTML += '<p style="color: #e53170;">Error: ' + error.message + '</p>';
+                    simpleBuildBtn.disabled = false;
+                    statusText.textContent = 'Build failed';
+                });
+            });
+        }
+        
+        // Refresh clients button
+        const refreshClientsBtn = document.getElementById('refresh-clients-btn');
+        if (refreshClientsBtn) {
+            refreshClientsBtn.addEventListener('click', function() {
+                refreshActiveClients();
+            });
+        }
+        
+        function refreshActiveClients() {
+            fetch('{{ url_for("dashboard.api_clients") }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateClientsTable(data.clients);
+                    }
+                })
+                .catch(error => console.error('Error fetching clients:', error));
+        }
+        
+        function updateClientsTable(clients) {
+            const tableBody = document.getElementById('active-clients-table');
+            if (!tableBody) return;
+            
+            if (clients.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="empty-state">No active direct connections</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            clients.forEach(client => {
+                html += `
+                <tr>
+                    <td><span class="session-id">${client.session_id}</span></td>
+                    <td>${client.ip_address}</td>
+                    <td>${client.connected_since}</td>
+                    <td>${client.duration}</td>
+                    <td>${client.data_transferred} bytes</td>
+                    <td>
+                        <form action="{{ url_for('remote.disconnect', session_id='') }}${client.session_id}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i data-feather="power"></i> Disconnect
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = html;
+            feather.replace();
+        }
+        
+        // Auto-refresh clients every 30 seconds
+        setInterval(refreshActiveClients, 30000);
+    });
+</script>
+{% endblock %}

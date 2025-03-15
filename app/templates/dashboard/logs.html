@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Connection Logs - {{ client.name }}{% endblock %}
+
+{% block content %}
+<div class="logs-container">
+    <div class="logs-header">
+        <h1>Connection Logs - {{ client.name }}</h1>
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+    
+    <div class="card">
+        <div class="logs-info">
+            <div class="info-item">
+                <span class="info-label">Host:</span>
+                <span class="info-value">{{ client.host }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Username:</span>
+                <span class="info-value">{{ client.username }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Type:</span>
+                <span class="info-value">{{ client.connection_type.upper() }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Total Connections:</span>
+                <span class="info-value">{{ logs|length }}</span>
+            </div>
+        </div>
+        
+        {% if logs %}
+        <div class="logs-filter">
+            <div class="filter-group">
+                <label for="statusFilter">Status:</label>
+                <select id="statusFilter" class="filter-select">
+                    <option value="all">All</option>
+                    <option value="connected">Connected</option>
+                    <option value="disconnected">Disconnected</option>
+                    <option value="failed">Failed</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="dateFilter">Date:</label>
+                <select id="dateFilter" class="filter-select">
+                    <option value="all">All time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This week</option>
+                    <option value="month">This month</option>
+                </select>
+            </div>
+            <div class="search-group">
+                <input type="text" id="logSearch" placeholder="Search logs..." class="search-input">
+            </div>
+        </div>
+        
+        <div class="logs-table-container">
+            <table class="logs-table">
+                <thead>
+                    <tr>
+                        <th>Connection Time</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>IP Address</th>
+                        <th>Commands</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr data-status="{{ log.status }}">
+                        <td>{{ log.connection_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>
+                            {% if log.duration %}
+                                {% if log.duration < 60 %}
+                                    {{ log.duration|int }}s
+                                {% elif log.duration < 3600 %}
+                                    {{ (log.duration / 60)|int }}m {{ (log.duration % 60)|int }}s
+                                {% else %}
+                                    {{ (log.duration / 3600)|int }}h {{ ((log.duration % 3600) / 60)|int }}m
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge {{ log.status }}">
+                                {{ log.status }}
+                            </span>
+                        </td>
+                        <td>{{ log.ip_address }}</td>
+                        <td>{{ log.commands_executed or 0 }}</td>
+                    </tr>
+                    {% if log.error_message %}
+                    <tr class="error-row">
+                        <td colspan="5">
+                            <div class="error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                {{ log.error_message }}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <h3>No connection logs yet</h3>
+            <p>Connection history will appear here once you connect to this client</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Filter logs by status
+    const statusFilter = document.getElementById('statusFilter');
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterLogs);
+    }
+    
+    // Filter logs by date
+    const dateFilter = document.getElementById('dateFilter');
+    
+    if (dateFilter) {
+        dateFilter.addEventListener('change', filterLogs);
+    }
+    
+    // Search logs
+    const logSearch = document.getElementById('logSearch');
+    
+    if (logSearch) {
+        logSearch.addEventListener('input', filterLogs);
+    }
+    
+    function filterLogs() {
+        const status = statusFilter.value;
+        const date = dateFilter.value;
+        const search = logSearch.value.toLowerCase();
+        
+        const rows = document.querySelectorAll('.logs-table tbody tr:not(.error-row)');
+        
+        rows.forEach(row => {
+            // Get the error row if it exists
+            const errorRow = row.nextElementSibling && row.nextElementSibling.classList.contains('error-row') 
+                ? row.nextElementSibling 
+                : null;
+            
+            // Check status filter
+            const statusMatch = status === 'all' || row.dataset.status === status;
+            
+            // Check date filter
+            let dateMatch = true;
+            
+            if (date !== 'all') {
+                const connectionTime = new Date(row.cells[0].textContent);
+                const now = new Date();
+                
+                if (date === 'today') {
+                    dateMatch = connectionTime.toDateString() === now.toDateString();
+                } else if (date === 'week') {
+                    const weekAgo = new Date();
+                    weekAgo.setDate(now.getDate() - 7);
+                    dateMatch = connectionTime >= weekAgo;
+                } else if (date === 'month') {
+                    const monthAgo = new Date();
+                    monthAgo.setMonth(now.getMonth() - 1);
+                    dateMatch = connectionTime >= monthAgo;
+                }
+            }
+            
+            // Check search filter
+            const rowText = Array.from(row.cells).map(cell => cell.textContent.toLowerCase()).join(' ');
+            const searchMatch = search === '' || rowText.includes(search);
+            
+            // Show/hide the row
+            const showRow = statusMatch && dateMatch && searchMatch;
+            row.style.display = showRow ? '' : 'none';
+            
+            // Show/hide the error row if it exists
+            if (errorRow) {
+                errorRow.style.display = showRow ? '' : 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}

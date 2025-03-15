@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Remote Access Portal{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-theme.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap">
+    <script src="https://unpkg.com/feather-icons"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            
+            <div class="container">
+                <div class="navbar-brand">
+                    <a href="{{ url_for('dashboard.index') }}" class="logo">
+                        <i data-feather="terminal"></i>
+                        <span>RemoteAccess</span>
+                    </a>
+                </div>
+            <!-- Refresh Controls Component -->
+            <div class="refresh-controls">
+                <div class="refresh-status">
+                    <div class="last-updated">
+                        <i data-feather="clock"></i>
+                        <span id="last-updated-time">Just now</span>
+                    </div>
+                    
+                    <label class="auto-refresh-toggle" title="Toggle automatic refreshing">
+                        <span class="toggle-switch">
+                            <input type="checkbox" id="auto-refresh-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </span>
+                        <span class="toggle-label">Auto-refresh</span>
+                    </label>
+                </div>
+                
+                <div class="refresh-actions">
+                    <div class="refresh-interval-selector">
+                        <select id="refresh-interval" title="Change refresh interval">
+                            <option value="10000">10 seconds</option>
+                            <option value="30000" selected>30 seconds</option>
+                            <option value="60000">1 minute</option>
+                            <option value="300000">5 minutes</option>
+                        </select>
+                    </div>
+                    
+                    <button id="refresh-now-btn" class="btn btn-sm" title="Refresh now">
+                        <i data-feather="refresh-cw"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Real-time Indicator (shows when auto-refresh is on) -->
+            <div id="realtime-indicator" class="realtime-indicator">
+                <span class="pulse-dot"></span> Real-time updates active
+            </div>
+
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('dashboard.index') }}" class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}">Dashboard</a></li>
+                        <li><a href="{{ url_for('remote.connections') }}" class="nav-link {% if request.endpoint == 'remote.connections' %}active{% endif %}">Connections</a></li>
+                        <li><a href="{{ url_for('remote.sessions') }}" class="nav-link {% if request.endpoint == 'remote.sessions' %}active{% endif %}">Sessions</a></li>
+                        <li><a href="{{ url_for('dashboard.clients') }}" class="nav-link {% if request.endpoint == 'dashboard.clients' %}active{% endif %}">Clients</a></li>
+                        {% if current_user.is_admin %}
+                            <li><a href="{{ url_for('dashboard.admin') }}" class="nav-link {% if request.endpoint == 'dashboard.admin' %}active{% endif %}">Admin</a></li>
+                        {% endif %}
+                        <li><a href="{{ url_for('auth.logout') }}" class="nav-link">Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('auth.login') }}" class="nav-link {% if request.endpoint == 'auth.login' %}active{% endif %}">Login</a></li>
+                        <li><a href="{{ url_for('auth.register') }}" class="nav-link {% if request.endpoint == 'auth.register' %}active{% endif %}">Register</a></li>
+                    {% endif %}
+                </ul>
+                
+            </div>
+        </nav>
+    </header>
+    
+    <main>
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 RemoteAccess. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize feather icons
+    feather.replace();
+    
+    // Initialize the Data Refresh Manager for this page
+    const refreshManager = new DataRefreshManager({
+        defaultInterval: 30000, // 30 seconds
+        endpoints: {
+            // Define each data section that needs refreshing
+            systemStats: {
+                url: '{{ url_for("dashboard.api_system_stats") }}',
+                targetSelector: '.system-metrics',
+                onSuccess: updateSystemMetrics,
+                successMessage: 'System stats updated',
+                errorMessage: 'Failed to update system stats'
+            },
+            activeSessions: {
+                url: '{{ url_for("dashboard.api_active_sessions") }}',
+                targetSelector: '#active-sessions-list',
+                onSuccess: updateActiveSessionsUI,
+                successMessage: 'Active sessions updated',
+                errorMessage: 'Failed to update active sessions'
+            }
+        },
+        // Global refresh callback (optional)
+        onRefresh: function() {
+            console.log('Refreshing all data...');
+            // Return a promise that resolves when all refreshes are complete
+            return Promise.all([
+                fetch('{{ url_for("dashboard.api_system_stats") }}').then(res => res.json()),
+                fetch('{{ url_for("dashboard.api_active_sessions") }}').then(res => res.json())
+            ]).then(([statsData, sessionsData]) => {
+                if (statsData.success) updateSystemMetrics(statsData);
+                if (sessionsData.success) updateActiveSessionsUI(sessionsData.sessions);
+            });
+        }
+    });
+    
+    // Example update functions (these should match your actual data structure)
+    function updateSystemMetrics(data) {
+        // Update CPU usage
+        const cpuBar = document.querySelector('.metric-bar.cpu');
+        const cpuValue = document.querySelector('.metric-item:nth-child(1) .metric-value');
+        if (cpuBar && cpuValue && data.system_load !== undefined) {
+            cpuBar.style.width = data.system_load + '%';
+            cpuValue.textContent = data.system_load + '%';
+        }
+        
+        // Update Memory usage
+        const memoryBar = document.querySelector('.metric-bar.memory');
+        const memoryValue = document.querySelector('.metric-item:nth-child(2) .metric-value');
+        if (memoryBar && memoryValue && data.memory_usage !== undefined) {
+            memoryBar.style.width = data.memory_usage + '%';
+            memoryValue.textContent = data.memory_usage + '%';
+        }
+        
+        // Update other metrics similarly...
+    }
+    
+    function updateActiveSessionsUI(sessions) {
+        const container = document.getElementById('active-sessions-list');
+        if (!container) return;
+        
+        if (!sessions || sessions.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i data-feather="zap-off"></i>
+                    <h3>No Active Sessions</h3>
+                    <p>You don't have any active connections at the moment.</p>
+                    <a href="{{ url_for('remote.connections') }}" class="btn btn-primary">
+                        <i data-feather="link"></i> Connect to a Server
+                    </a>
+                </div>
+            `;
+            feather.replace();
+            return;
+        }
+        
+        // Build session HTML
+        let html = '';
+        sessions.forEach(session => {
+            // Your session HTML template
+            html += `
+                <div class="session-item">
+                    <!-- Session details -->
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        feather.replace();
+    }
+});
+
+        // Initialize Feather icons
+        feather.replace();
+        
+        // Check user's preferred theme
+        function setTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+        
+        setTheme();
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

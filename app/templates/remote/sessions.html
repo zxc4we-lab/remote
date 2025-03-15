@@ -1,0 +1,950 @@
+{% extends "base.html" %}
+
+{% block title %}Active Sessions - Remote Access Portal{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Sessions Page Styles */
+.sessions-container {
+    padding: 1.5rem 0;
+}
+
+.sessions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.sessions-title h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.sessions-title p {
+    margin: 0.25rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.sessions-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.sessions-card {
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sessions-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border-color: rgba(127, 90, 240, 0.3);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+}
+
+.card-title svg {
+    margin-right: 0.5rem;
+    color: var(--accent-primary);
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.session-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border-left: 3px solid transparent;
+    background-color: var(--bg-tertiary);
+}
+
+.session-item:last-child {
+    margin-bottom: 0;
+}
+
+.session-item:hover {
+    background-color: rgba(127, 90, 240, 0.1);
+    transform: translateX(4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+    border-left-color: var(--accent-primary);
+}
+
+.session-icon {
+    width: 48px;
+    height: 48px;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 1rem;
+    color: var(--accent-primary);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+}
+
+.session-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.session-item:hover .session-icon {
+    transform: scale(1.1);
+}
+
+.session-details {
+    flex: 1;
+}
+
+.session-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.session-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-right: 0.75rem;
+}
+
+.session-type {
+    font-size: 0.8rem;
+    background-color: rgba(127, 90, 240, 0.15);
+    color: var(--accent-primary);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.session-type.ssh {
+    background-color: rgba(127, 90, 240, 0.15);
+    color: var(--accent-primary);
+}
+
+.session-type.rdp {
+    background-color: rgba(44, 182, 125, 0.15);
+    color: var(--accent-secondary);
+}
+
+.session-type.vnc {
+    background-color: rgba(255, 209, 102, 0.15);
+    color: #ffd166;
+}
+
+.session-type.direct {
+    background-color: rgba(229, 49, 112, 0.15);
+    color: var(--accent-danger);
+}
+
+.session-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.session-info-item {
+    display: flex;
+    align-items: center;
+}
+
+.session-info-item svg {
+    width: 14px;
+    height: 14px;
+    margin-right: 0.25rem;
+    opacity: 0.7;
+}
+
+.session-info-item.session-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    background-color: var(--bg-secondary);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px;
+}
+
+.session-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    margin-left: 1rem;
+}
+
+.metrics-row {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.75rem;
+}
+
+.metric-item {
+    flex: 1;
+    background-color: var(--bg-secondary);
+    padding: 0.75rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.metric-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.empty-state svg {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+    color: var(--text-secondary);
+}
+
+.empty-state h3 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.empty-state p {
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    max-width: 400px;
+}
+
+.empty-state .btn {
+    display: inline-flex;
+    align-items: center;
+}
+
+.empty-state .btn svg {
+    width: 16px;
+    height: 16px;
+    margin-right: 0.5rem;
+    margin-bottom: 0;
+    opacity: 1;
+}
+
+.last-updated {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.last-updated svg {
+    margin-right: 4px;
+    width: 14px;
+    height: 14px;
+}
+
+.auto-refresh-toggle {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 32px;
+    height: 18px;
+    margin-right: 5px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-tertiary);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--text-secondary);
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: var(--accent-primary);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(14px);
+    background-color: white;
+}
+
+.toggle-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.live-indicator {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-left: 0.5rem;
+}
+
+.live-indicator::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--accent-secondary);
+    margin-right: 4px;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+.disconnect-all-btn {
+    background-color: var(--accent-danger);
+    color: white;
+}
+
+.disconnect-all-btn:hover {
+    background-color: #d12a5e;
+}
+
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.toast {
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-left: 4px solid var(--accent-primary);
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast-icon {
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.toast-success {
+    border-left-color: var(--accent-secondary);
+}
+
+.toast-error {
+    border-left-color: var(--accent-danger);
+}
+
+.toast-info {
+    border-left-color: var(--accent-primary);
+}
+
+@media (max-width: 768px) {
+    .session-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .session-icon {
+        margin-bottom: 0.75rem;
+    }
+    
+    .session-actions {
+        margin-left: 0;
+        margin-top: 0.75rem;
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .session-info {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .metrics-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sessions-container">
+    <!-- Sessions Header -->
+    <div class="sessions-header">
+        <div class="sessions-title">
+            <h1>Active Sessions</h1>
+            <p>Manage your current remote connections</p>
+        </div>
+        <div class="sessions-actions">
+            {% if sessions and sessions|length > 0 %}
+            <form action="{{ url_for('remote.disconnect_all') }}" method="POST" onsubmit="return confirm('Are you sure you want to disconnect all sessions?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn disconnect-all-btn">
+                    <i data-feather="power"></i> Disconnect All
+                </button>
+            </form>
+            {% endif %}
+            <a href="{{ url_for('remote.connections') }}" class="btn btn-primary">
+                <i data-feather="plus"></i> New Connection
+            </a>
+        </div>
+    </div>
+    
+    <!-- Sessions List -->
+    <div class="sessions-card">
+        <div class="card-header">
+            <div class="card-title">
+                <i data-feather="zap"></i> Active Sessions
+            </div>
+            <div class="card-actions">
+                <div class="last-updated">
+                    <i data-feather="clock"></i>
+                    <span id="last-updated-time">Just now</span>
+                </div>
+                <label class="auto-refresh-toggle">
+                    <span class="toggle-switch">
+                        <input type="checkbox" id="auto-refresh-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </span>
+                    <span class="toggle-label">Auto</span>
+                </label>
+                <button id="refresh-sessions-btn" class="btn">
+                    <i data-feather="refresh-cw"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="sessions-list">
+            {% if sessions and sessions|length > 0 %}
+                {% for session in sessions %}
+                <div class="session-item">
+                    <div class="session-icon">
+                        {% if session.connection_type == 'ssh' %}
+                            <i data-feather="terminal"></i>
+                        {% elif session.connection_type == 'rdp' %}
+                            <i data-feather="monitor"></i>
+                        {% elif session.connection_type == 'vnc' %}
+                            <i data-feather="monitor"></i>
+                        {% elif session.connection_type == 'direct' %}
+                            <i data-feather="link"></i>
+                        {% else %}
+                            <i data-feather="server"></i>
+                        {% endif %}
+                    </div>
+                    <div class="session-details">
+                        <div class="session-title">
+                            <div class="session-name">{{ session.host }}</div>
+                            <div class="session-type {{ session.connection_type }}">{{ session.connection_type }}</div>
+                        </div>
+                        <div class="session-info">
+                            <div class="session-info-item session-id" title="{{ session.session_id }}">
+                                <i data-feather="hash"></i>
+                                {{ session.session_id }}
+                            </div>
+                            <div class="session-info-item">
+                                <i data-feather="wifi"></i>
+                                {{ session.host }}{% if session.port %}:{{ session.port }}{% endif %}
+                            </div>
+                            <div class="session-info-item">
+                                <i data-feather="clock"></i>
+                                Connected for {{ ((session.duration / 60)|int) }}m {{ (session.duration % 60)|int }}s
+                            </div>
+                            <div class="session-info-item">
+                                <i data-feather="database"></i>
+                                {% if session.data_transferred < 1024 %}
+                                    {{ session.data_transferred }} bytes
+                                {% elif session.data_transferred < 1048576 %}
+                                    {{ (session.data_transferred / 1024)|round(2) }} KB
+                                {% else %}
+                                    {{ (session.data_transferred / 1048576)|round(2) }} MB
+                                {% endif %}
+                                transferred
+                            </div>
+                        </div>
+                    </div>
+                    <div class="session-actions">
+                        <form action="{{ url_for('remote.disconnect', session_id=session.session_id) }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-danger">
+                                <i data-feather="power"></i> Disconnect
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i data-feather="zap-off"></i>
+                    <h3>No Active Sessions</h3>
+                    <p>You don't have any active connections at the moment. Connect to a server to start a new session.</p>
+                    <a href="{{ url_for('remote.connections') }}" class="btn btn-primary">
+                        <i data-feather="link"></i> Connect to a Server
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- System Metrics -->
+    <div class="sessions-card">
+        <div class="card-header">
+            <div class="card-title">
+                <i data-feather="activity"></i> Connection Metrics
+            </div>
+        </div>
+        
+        <div class="metrics-row">
+            <div class="metric-item">
+                <div class="metric-value">{{ sessions|length if sessions else 0 }}</div>
+                <div class="metric-label">Active Sessions</div>
+            </div>
+            
+            <div class="metric-item">
+                <div class="metric-value">
+                    {% set total_duration = 0 %}
+                    {% if sessions %}
+                        {% for session in sessions %}
+                            {% set total_duration = total_duration + session.duration %}
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {% if total_duration < 60 %}
+                        {{ total_duration }}s
+                    {% elif total_duration < 3600 %}
+                        {{ (total_duration / 60)|int }}m {{ (total_duration % 60)|int }}s
+                    {% else %}
+                        {{ (total_duration / 3600)|int }}h {{ ((total_duration % 3600) / 60)|int }}m
+                    {% endif %}
+                </div>
+                <div class="metric-label">Total Connection Time</div>
+            </div>
+            
+            <div class="metric-item">
+                <div class="metric-value">
+                    {% set total_data = 0 %}
+                    {% if sessions %}
+                        {% for session in sessions %}
+                            {% set total_data = total_data + session.data_transferred %}
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {% if total_data < 1024 %}
+                        {{ total_data }} bytes
+                    {% elif total_data < 1048576 %}
+                        {{ (total_data / 1024)|round(2) }} KB
+                    {% else %}
+                        {{ (total_data / 1048576)|round(2) }} MB
+                    {% endif %}
+                </div>
+                <div class="metric-label">Total Data Transferred</div>
+            </div>
+            
+            <div class="metric-item">
+                <div class="metric-value">
+                    {% if sessions and sessions|length > 0 %}
+                        {{ ((sessions|sum(attribute='data_transferred') / sessions|length) / 1024)|round(2) }} KB
+                    {% else %}
+                        0 KB
+                    {% endif %}
+                </div>
+                <div class="metric-label">Average Data Per Session</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification Container -->
+<div class="toast-container" id="toast-container"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize feather icons
+    feather.replace();
+    
+    // Auto-refresh management
+    let autoRefreshEnabled = true;
+    let refreshInterval;
+    let lastRefreshTime = new Date();
+    
+    // Handle auto-refresh toggle
+    const autoRefreshToggle = document.getElementById('auto-refresh-toggle');
+    if (autoRefreshToggle) {
+        autoRefreshToggle.checked = autoRefreshEnabled;
+        
+        autoRefreshToggle.addEventListener('change', function() {
+            autoRefreshEnabled = this.checked;
+            
+            if (autoRefreshEnabled) {
+                startAutoRefresh();
+                showToast('Auto-refresh enabled', 'info');
+            } else {
+                clearInterval(refreshInterval);
+                showToast('Auto-refresh disabled', 'info');
+            }
+            
+            updateLastRefreshIndicator();
+        });
+    }
+    
+    // Refresh sessions button
+    const refreshSessionsBtn = document.getElementById('refresh-sessions-btn');
+    if (refreshSessionsBtn) {
+        refreshSessionsBtn.addEventListener('click', function() {
+            this.disabled = true;
+            this.innerHTML = '<div class="spinner"></div>';
+            
+            refreshSessions(true).finally(() => {
+                setTimeout(() => {
+                    this.disabled = false;
+                    this.innerHTML = '<i data-feather="refresh-cw"></i>';
+                    feather.replace();
+                }, 500);
+            });
+        });
+    }
+    
+    // Update last refresh indicator
+    function updateLastRefreshIndicator() {
+        const lastUpdatedElem = document.getElementById('last-updated-time');
+        if (lastUpdatedElem) {
+            const timeStr = lastRefreshTime.toLocaleTimeString();
+            lastUpdatedElem.textContent = timeStr;
+            
+            // Add visual indicator for auto-refresh status
+            if (autoRefreshEnabled) {
+                lastUpdatedElem.innerHTML += ' <span class="live-indicator">live</span>';
+            }
+        }
+    }
+    
+    // Fetch and refresh sessions
+    function refreshSessions(showFeedback = false) {
+        return fetch('{{ url_for("remote.api_sessions") }}')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    updateSessionsUI(data.sessions);
+                    lastRefreshTime = new Date();
+                    updateLastRefreshIndicator();
+                    
+                    if (showFeedback) {
+                        showToast(`${data.sessions.length} active sessions found`, 'success');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error refreshing sessions:', error);
+                if (showFeedback) {
+                    showToast('Failed to refresh sessions: ' + error.message, 'error');
+                }
+            });
+    }
+    
+    // Update sessions UI
+    function updateSessionsUI(sessions) {
+        const sessionsContainer = document.getElementById('sessions-list');
+        if (!sessionsContainer) return;
+        
+        if (!sessions || sessions.length === 0) {
+            sessionsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i data-feather="zap-off"></i>
+                    <h3>No Active Sessions</h3>
+                    <p>You don't have any active connections at the moment. Connect to a server to start a new session.</p>
+                    <a href="{{ url_for('remote.connections') }}" class="btn btn-primary">
+                        <i data-feather="link"></i> Connect to a Server
+                    </a>
+                </div>
+            `;
+            feather.replace();
+            return;
+        }
+        
+        let html = '';
+        sessions.forEach(session => {
+            let icon = 'terminal';
+            if (session.connection_type === 'rdp' || session.connection_type === 'vnc') {
+                icon = 'monitor';
+            } else if (session.connection_type === 'direct') {
+                icon = 'link';
+            }
+            
+            // Format duration
+            const minutes = Math.floor(session.duration / 60);
+            const seconds = Math.floor(session.duration % 60);
+            const durationStr = `${minutes}m ${seconds}s`;
+            
+            // Format data transferred
+            let dataStr;
+            if (session.data_transferred < 1024) {
+                dataStr = `${session.data_transferred} bytes`;
+            } else if (session.data_transferred < 1048576) {
+                dataStr = `${(session.data_transferred / 1024).toFixed(2)} KB`;
+            } else {
+                dataStr = `${(session.data_transferred / 1048576).toFixed(2)} MB`;
+            }
+            
+            html += `
+                <div class="session-item">
+                    <div class="session-icon">
+                        <i data-feather="${icon}"></i>
+                    </div>
+                    <div class="session-details">
+                        <div class="session-title">
+                            <div class="session-name">${session.host}</div>
+                            <div class="session-type ${session.connection_type}">${session.connection_type}</div>
+                        </div>
+                        <div class="session-info">
+                            <div class="session-info-item session-id" title="${session.session_id}">
+                                <i data-feather="hash"></i>
+                                ${session.session_id}
+                            </div>
+                            <div class="session-info-item">
+                                <i data-feather="wifi"></i>
+                                ${session.host}${session.port ? `:${session.port}` : ''}
+                            </div>
+                            <div class="session-info-item">
+                                <i data-feather="clock"></i>
+                                Connected for ${durationStr}
+                            </div>
+                            <div class="session-info-item">
+                                <i data-feather="database"></i>
+                                ${dataStr} transferred
+                            </div>
+                        </div>
+                    </div>
+                    <div class="session-actions">
+                        <form action="{{ url_for('remote.disconnect', session_id='') }}${session.session_id}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-danger">
+                                <i data-feather="power"></i> Disconnect
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        });
+        
+        sessionsContainer.innerHTML = html;
+        feather.replace();
+        
+        // Update metrics
+        updateSessionMetrics(sessions);
+    }
+    
+    // Update session metrics
+    function updateSessionMetrics(sessions) {
+        // Update total duration
+        const totalDuration = sessions.reduce((sum, session) => sum + session.duration, 0);
+        let durationStr;
+        
+        if (totalDuration < 60) {
+            durationStr = `${totalDuration}s`;
+        } else if (totalDuration < 3600) {
+            const minutes = Math.floor(totalDuration / 60);
+            const seconds = Math.floor(totalDuration % 60);
+            durationStr = `${minutes}m ${seconds}s`;
+        } else {
+            const hours = Math.floor(totalDuration / 3600);
+            const minutes = Math.floor((totalDuration % 3600) / 60);
+            durationStr = `${hours}h ${minutes}m`;
+        }
+        
+        // Update total data transferred
+        const totalData = sessions.reduce((sum, session) => sum + session.data_transferred, 0);
+        let dataStr;
+        
+        if (totalData < 1024) {
+            dataStr = `${totalData} bytes`;
+        } else if (totalData < 1048576) {
+            dataStr = `${(totalData / 1024).toFixed(2)} KB`;
+        } else {
+            dataStr = `${(totalData / 1048576).toFixed(2)} MB`;
+        }
+        
+        // Update average data per session
+        const avgData = sessions.length > 0 ? totalData / sessions.length : 0;
+        let avgDataStr;
+        
+        if (avgData < 1024) {
+            avgDataStr = `${avgData.toFixed(2)} bytes`;
+        } else if (avgData < 1048576) {
+            avgDataStr = `${(avgData / 1024).toFixed(2)} KB`;
+        } else {
+            avgDataStr = `${(avgData / 1048576).toFixed(2)} MB`;
+        }
+        
+        // Update metrics in the UI
+        const metricItems = document.querySelectorAll('.metric-item .metric-value');
+        if (metricItems.length >= 4) {
+            // Active sessions count
+            metricItems[0].textContent = sessions.length;
+            
+            // Total duration
+            metricItems[1].textContent = durationStr;
+            
+            // Total data transferred
+            metricItems[2].textContent = dataStr;
+            
+            // Average data per session
+            metricItems[3].textContent = avgDataStr;
+        }
+    }
+    
+    // Start auto-refresh
+    function startAutoRefresh() {
+        // Clear any existing interval
+        if (refreshInterval) {
+            clearInterval(refreshInterval);
+        }
+        
+        // Create new interval
+        refreshInterval = setInterval(() => {
+            refreshSessions(false);
+        }, 15000); // Refresh every 15 seconds
+    }
+    
+    // Toast notification system
+    function showToast(message, type = 'info', duration = 3000) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        // Add icon based on type
+        let iconName = 'info';
+        if (type === 'success') iconName = 'check-circle';
+        if (type === 'error') iconName = 'alert-circle';
+        
+        toast.innerHTML = `
+            <div class="toast-icon">
+                <i data-feather="${iconName}"></i>
+            </div>
+            <div class="toast-content">${message}</div>
+        `;
+        
+        // Add to container
+        container.appendChild(toast);
+        
+        // Initialize feather icon
+        feather.replace();
+        
+        // Show with animation
+        setTimeout(() => toast.classList.add('show'), 10);
+        
+        // Remove after duration
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+    
+    // Initial load
+    updateLastRefreshIndicator();
+    
+    // Start auto-refresh if enabled
+    if (autoRefreshEnabled) {
+        startAutoRefresh();
+    }
+});
+</script>
+{% endblock %}

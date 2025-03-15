@@ -1,0 +1,203 @@
+2025-03-14 23:28:51,376 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:28:51,386 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:32:20,682 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:32:20,686 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:32:20,738 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-03-14 23:32:20,739 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-14 23:32:26,492 - app - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 1341, in handle_user_exception
+    return self.handle_http_exception(e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 1281, in handle_http_exception
+    return self.ensure_sync(handler)(e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\zxc4we\Desktop\remote_access\app\__init__.py", line 62, in page_not_found
+    return render_template('error/404.html'), 404
+           ^^^^^^^^^^^^^^^
+NameError: name 'render_template' is not defined
+2025-03-14 23:32:26,546 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:32:26] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2025-03-14 23:32:26,667 - werkzeug - ERROR - Error on request:
+Traceback (most recent call last):
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\werkzeug\routing\map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 1341, in handle_user_exception
+    return self.handle_http_exception(e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 1281, in handle_http_exception
+    return self.ensure_sync(handler)(e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\zxc4we\Desktop\remote_access\app\__init__.py", line 62, in page_not_found
+    return render_template('error/404.html'), 404
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'render_template' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\werkzeug\serving.py", line 364, in run_wsgi
+    execute(self.server.app)
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\werkzeug\serving.py", line 325, in execute
+    application_iter = app(environ, start_response)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 2213, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 2193, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\zxc4we\Desktop\remote_access\.venv\Lib\site-packages\flask\app.py", line 1399, in handle_exception
+    server_error = self.ensure_sync(handler)(server_error)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\zxc4we\Desktop\remote_access\app\__init__.py", line 66, in internal_server_error
+    return render_template('error/500.html'), 500
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'render_template' is not defined
+2025-03-14 23:32:34,410 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:32:34,414 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:32:35,356 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.100.104:5000
+2025-03-14 23:32:35,358 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-14 23:32:35,364 - werkzeug - INFO -  * Restarting with stat
+2025-03-14 23:32:38,933 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:32:38,940 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:32:39,034 - werkzeug - WARNING -  * Debugger is active!
+2025-03-14 23:32:39,049 - werkzeug - INFO -  * Debugger PIN: 141-270-428
+2025-03-14 23:32:39,274 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:32:39] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2025-03-14 23:32:39,546 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:32:39] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-03-14 23:32:39,569 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:32:39] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-03-14 23:32:39,604 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:32:39] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-03-14 23:32:39,630 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:32:39] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-03-14 23:36:43,308 - werkzeug - INFO -  * Detected change in 'C:\\Users\\zxc4we\\Desktop\\remote_access\\app\\routes\\remote.py', reloading
+2025-03-14 23:39:01,889 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:39:01,898 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:39:02,836 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.100.104:5000
+2025-03-14 23:39:02,838 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-14 23:39:02,845 - werkzeug - INFO -  * Restarting with stat
+2025-03-14 23:39:06,445 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:39:06,451 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:39:06,528 - werkzeug - WARNING -  * Debugger is active!
+2025-03-14 23:39:06,543 - werkzeug - INFO -  * Debugger PIN: 141-270-428
+2025-03-14 23:39:06,993 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:39:06] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2025-03-14 23:39:07,245 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:39:07] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-03-14 23:39:07,249 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:39:07] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-03-14 23:39:07,288 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:39:07] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-03-14 23:39:07,310 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:39:07] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-03-14 23:39:25,166 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:39:25,170 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:39:26,116 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.100.104:5000
+2025-03-14 23:39:26,118 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-14 23:39:26,124 - werkzeug - INFO -  * Restarting with stat
+2025-03-14 23:39:29,569 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:39:29,575 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:39:29,674 - werkzeug - WARNING -  * Debugger is active!
+2025-03-14 23:39:29,689 - werkzeug - INFO -  * Debugger PIN: 141-270-428
+2025-03-14 23:39:30,077 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:39:30] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2025-03-14 23:39:30,328 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:39:30] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-03-14 23:39:30,330 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:39:30] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-03-14 23:39:30,384 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:39:30] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-03-14 23:39:30,410 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:39:30] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-03-14 23:42:24,159 - werkzeug - INFO -  * Detected change in 'C:\\Users\\zxc4we\\Desktop\\remote_access\\init_db.py', reloading
+2025-03-14 23:42:27,186 - werkzeug - INFO -  * Restarting with stat
+2025-03-14 23:42:30,926 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:42:30,933 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:42:31,012 - werkzeug - WARNING -  * Debugger is active!
+2025-03-14 23:42:31,026 - werkzeug - INFO -  * Debugger PIN: 141-270-428
+2025-03-14 23:44:26,463 - werkzeug - INFO -  * Detected change in 'C:\\Users\\zxc4we\\Desktop\\remote_access\\app\\routes\\auth.py', reloading
+2025-03-14 23:45:20,535 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:45:20,537 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:45:21,410 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.100.104:5000
+2025-03-14 23:45:21,412 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-14 23:45:21,417 - werkzeug - INFO -  * Restarting with stat
+2025-03-14 23:45:22,855 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:45:22,856 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:45:22,880 - werkzeug - WARNING -  * Debugger is active!
+2025-03-14 23:45:22,890 - werkzeug - INFO -  * Debugger PIN: 126-876-144
+2025-03-14 23:45:26,262 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:45:26] "[32mGET / HTTP/1.1[0m" 302 -
+2025-03-14 23:45:26,274 - root - INFO - User admin accessed dashboard
+2025-03-14 23:45:26,281 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:45:26] "GET /dashboard HTTP/1.1" 200 -
+2025-03-14 23:45:30,339 - root - INFO - User admin accessed dashboard
+2025-03-14 23:45:30,341 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:45:30] "GET /dashboard HTTP/1.1" 200 -
+2025-03-14 23:48:11,185 - werkzeug - INFO -  * Detected change in 'C:\\Users\\zxc4we\\Desktop\\remote_access\\run.py', reloading
+2025-03-14 23:48:11,309 - werkzeug - INFO -  * Restarting with stat
+2025-03-14 23:48:12,775 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:48:12,777 - root - INFO - ClientManager initialized successfully
+2025-03-14 23:48:12,804 - werkzeug - WARNING -  * Debugger is active!
+2025-03-14 23:48:12,814 - werkzeug - INFO -  * Debugger PIN: 126-876-144
+2025-03-14 23:48:15,424 - root - INFO - User admin accessed dashboard
+2025-03-14 23:48:15,482 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:48:15] "GET /dashboard HTTP/1.1" 200 -
+2025-03-14 23:48:15,684 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:48:15] "GET /static/css/dark-theme.css HTTP/1.1" 200 -
+2025-03-14 23:48:23,000 - root - INFO - User admin accessed dashboard
+2025-03-14 23:48:23,003 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:48:23] "GET /dashboard HTTP/1.1" 200 -
+2025-03-14 23:48:23,057 - werkzeug - INFO - 127.0.0.1 - - [14/Mar/2025 23:48:23] "[36mGET /static/css/dark-theme.css HTTP/1.1[0m" 304 -
+2025-03-15 00:05:58,699 - werkzeug - INFO -  * Detected change in 'C:\\Users\\zxc4we\\Desktop\\remote_access\\app\\models\\connection.py', reloading
+2025-03-15 00:05:58,890 - werkzeug - INFO -  * Restarting with stat
+2025-03-15 00:06:00,297 - root - INFO - ClientManager initialized successfully
+2025-03-15 00:06:00,299 - root - INFO - ClientManager initialized successfully
+2025-03-15 00:06:00,323 - werkzeug - WARNING -  * Debugger is active!
+2025-03-15 00:06:00,334 - werkzeug - INFO -  * Debugger PIN: 126-876-144
+2025-03-15 00:06:12,276 - werkzeug - INFO -  * Detected change in 'C:\\Users\\zxc4we\\Desktop\\remote_access\\app\\config.py', reloading
+2025-03-15 00:06:12,389 - werkzeug - INFO -  * Restarting with stat
+2025-03-15 00:06:13,686 - root - INFO - ClientManager initialized successfully
+2025-03-15 00:06:13,688 - root - INFO - ClientManager initialized successfully
+2025-03-15 00:06:13,708 - werkzeug - WARNING -  * Debugger is active!
+2025-03-15 00:06:13,719 - werkzeug - INFO -  * Debugger PIN: 126-876-144
+2025-03-15 00:06:20,225 - werkzeug - INFO -  * Detected change in 'C:\\Users\\zxc4we\\Desktop\\remote_access\\app\\__init__.py', reloading
+2025-03-15 00:06:20,349 - werkzeug - INFO -  * Restarting with stat

@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Remote Control - Remote Access{% endblock %}
+
+{% block content %}
+<div class="remote-container">
+    <div class="remote-header">
+        <div class="connection-info">
+            <h2>Remote Control</h2>
+            <div id="connection-status" class="status-badge status-disconnected">Disconnected</div>
+        </div>
+        <div class="connection-controls">
+            <button id="disconnect-btn" class="btn btn-danger" onclick="disconnect()">Disconnect</button>
+        </div>
+    </div>
+
+    <div class="terminal-container">
+        <div id="command-output" class="terminal-output"></div>
+        <form id="command-form" class="terminal-input-form">
+            <div class="terminal-prompt">$</div>
+            <input type="text" id="command-input" class="terminal-input" placeholder="Enter command..." autofocus>
+            <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.remote-container {
+    height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.remote-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.connection-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.terminal-container {
+    flex: 1;
+    background-color: var(--terminal-bg);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.terminal-output {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    color: var(--terminal-text);
+    white-space: pre-wrap;
+}
+
+.terminal-input-form {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--terminal-input-bg);
+    border-top: 1px solid var(--border-color);
+}
+
+.terminal-prompt {
+    color: var(--terminal-prompt);
+    margin-right: 0.5rem;
+    font-family: 'Courier New', monospace;
+}
+
+.terminal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--terminal-text);
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    padding: 0.5rem;
+    outline: none;
+}
+
+.command-result {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border-radius: 4px;
+    background-color: var(--terminal-result-bg);
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+}
+
+.status-connected {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.status-disconnected {
+    background-color: var(--error-color);
+    color: white;
+}
+
+.status-connecting {
+    background-color: var(--warning-color);
+    color: var(--text-color);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="{{ url_for('static', filename='js/remote.js') }}"></script>
+{% endblock %} 

@@ -1,0 +1,835 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Remote Access Portal{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Enhanced Dashboard Styles */
+:root {
+    --card-border-radius: 12px;
+    --stat-item-height: 100px;
+}
+
+.dashboard-container {
+    padding: 1.5rem 0;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.dashboard-title h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.dashboard-title p {
+    margin: 0.25rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.dashboard-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--card-border-radius);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: var(--stat-item-height);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    color: var(--accent-primary);
+    opacity: 0.2;
+    font-size: 2rem;
+}
+
+.stat-title {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.stat-change {
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    margin-top: auto;
+}
+
+.stat-change.positive {
+    color: var(--accent-secondary);
+}
+
+.stat-change.negative {
+    color: var(--accent-danger);
+}
+
+.stat-change svg {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.dashboard-card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--card-border-radius);
+    padding: 1.25rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dashboard-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+}
+
+.dashboard-card-title svg {
+    margin-right: 0.5rem;
+    color: var(--accent-primary);
+}
+
+.dashboard-card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.dashboard-card-actions .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+}
+
+.connection-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    transition: background-color 0.2s;
+}
+
+.connection-item:hover {
+    background-color: var(--bg-tertiary);
+}
+
+.connection-item:last-child {
+    margin-bottom: 0;
+}
+
+.connection-icon {
+    width: 40px;
+    height: 40px;
+    background-color: var(--bg-tertiary);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 1rem;
+    color: var(--accent-primary);
+}
+
+.connection-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.connection-details {
+    flex: 1;
+}
+
+.connection-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+}
+
+.connection-info {
+    display: flex;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.connection-info span {
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+}
+
+.connection-info svg {
+    width: 14px;
+    height: 14px;
+    margin-right: 0.25rem;
+    opacity: 0.7;
+}
+
+.connection-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.system-metrics {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.metric-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.metric-title {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.metric-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.metric-bar-container {
+    height: 8px;
+    background-color: var(--bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.metric-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.metric-bar.cpu {
+    background: linear-gradient(to right, var(--accent-secondary), var(--accent-primary));
+}
+
+.metric-bar.memory {
+    background: linear-gradient(to right, #3a86ff, #ff006e);
+}
+
+.metric-bar.disk {
+    background: linear-gradient(to right, #8338ec, #3a86ff);
+}
+
+.metric-bar.network {
+    background: linear-gradient(to right, #06d6a0, #118ab2);
+}
+
+.activity-list {
+    margin-top: 0.5rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.activity-icon.connect {
+    background-color: rgba(44, 182, 125, 0.2);
+    color: var(--accent-secondary);
+}
+
+.activity-icon.disconnect {
+    background-color: rgba(229, 49, 112, 0.2);
+    color: var(--accent-danger);
+}
+
+.activity-icon.action {
+    background-color: rgba(127, 90, 240, 0.2);
+    color: var(--accent-primary);
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.empty-state svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.empty-state p {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 1200px) {
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .dashboard-actions {
+        margin-top: 1rem;
+        width: 100%;
+    }
+    
+    .dashboard-actions .btn {
+        flex: 1;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="dashboard-title">
+            <h1>Welcome back, {{ current_user.username }}</h1>
+            <p>{{ current_user.last_login.strftime('%B %d, %Y at %H:%M') if current_user.last_login else 'This is your first login' }}</p>
+        </div>
+        <div class="dashboard-actions">
+            <a href="{{ url_for('remote.new_connection') }}" class="btn btn-primary">
+                <i data-feather="plus"></i> New Connection
+            </a>
+            <a href="{{ url_for('dashboard.clients') }}" class="btn">
+                <i data-feather="download"></i> Download Client
+            </a>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i data-feather="server"></i>
+            </div>
+            <div class="stat-title">Connections</div>
+            <div class="stat-value">{{ connections_count }}</div>
+            <div class="stat-change positive">
+                <i data-feather="trending-up"></i> 5% from last week
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i data-feather="activity"></i>
+            </div>
+            <div class="stat-title">Active Sessions</div>
+            <div class="stat-value">{{ active_sessions }}</div>
+            <div class="stat-change positive">
+                <i data-feather="trending-up"></i> 12% from last week
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i data-feather="clock"></i>
+            </div>
+            <div class="stat-title">Connection Time</div>
+            <div class="stat-value">{{ total_connection_time }}</div>
+            <div class="stat-change negative">
+                <i data-feather="trending-down"></i> 3% from last week
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i data-feather="hard-drive"></i>
+            </div>
+            <div class="stat-title">Data Transferred</div>
+            <div class="stat-value">2.4 GB</div>
+            <div class="stat-change positive">
+                <i data-feather="trending-up"></i> 8% from last week
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content Grid -->
+    <div class="dashboard-grid">
+        <!-- Recent Connections -->
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <div class="dashboard-card-title">
+                    <i data-feather="grid"></i> Recent Connections
+                </div>
+                <div class="dashboard-card-actions">
+                    <a href="{{ url_for('remote.connections') }}" class="btn">View All</a>
+                </div>
+            </div>
+            <a href="{{ url_for('remote.manage') }}" class="btn">
+                <i data-feather="monitor"></i> Remote Management
+            </a>
+            <div class="dashboard-card-content">
+                {% if recent_connections %}
+                    {% for connection in recent_connections %}
+                    <div class="connection-item">
+                        <div class="connection-icon">
+                            {% if connection.connection_type == 'ssh' %}
+                                <i data-feather="terminal"></i>
+                            {% elif connection.connection_type == 'rdp' %}
+                                <i data-feather="monitor"></i>
+                            {% elif connection.connection_type == 'vnc' %}
+                                <i data-feather="monitor"></i>
+                            {% else %}
+                                <i data-feather="server"></i>
+                            {% endif %}
+                        </div>
+                        <div class="connection-details">
+                            <div class="connection-name">{{ connection.hostname }}</div>
+                            <div class="connection-info">
+                                <span><i data-feather="wifi"></i> {{ connection.ip_address }}</span>
+                                <span><i data-feather="hash"></i> Port {{ connection.port }}</span>
+                                <span><i data-feather="clock"></i> 
+                                    {% if connection.last_connected %}
+                                        {{ connection.last_connected.strftime('%b %d, %Y') }}
+                                    {% else %}
+                                        Never connected
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="connection-actions">
+                            <a href="{{ url_for('remote.connect', id=connection.id) }}" class="btn btn-sm btn-primary">
+                                <i data-feather="link"></i> Connect
+                            </a>
+                            <a href="{{ url_for('remote.edit_connection', id=connection.id) }}" class="btn btn-sm">
+                                <i data-feather="edit"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i data-feather="server"></i>
+                        <h3>No Connections Yet</h3>
+                        <p>You haven't created any connections yet.</p>
+                        <a href="{{ url_for('remote.new_connection') }}" class="btn btn-primary">
+                            <i data-feather="plus"></i> Create Your First Connection
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- System Status -->
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <div class="dashboard-card-title">
+                    <i data-feather="activity"></i> System Status
+                </div>
+                <div class="dashboard-card-actions">
+                    <button id="refresh-stats-btn" class="btn">
+                        <i data-feather="refresh-cw"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="dashboard-card-content">
+                <div class="system-metrics">
+                    <div class="metric-item">
+                        <div class="metric-header">
+                            <div class="metric-title">CPU Usage</div>
+                            <div class="metric-value">{{ system_load }}%</div>
+                        </div>
+                        <div class="metric-bar-container">
+                            <div class="metric-bar cpu" style="width: {{ system_load }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-item">
+                        <div class="metric-header">
+                            <div class="metric-title">Memory Usage</div>
+                            <div class="metric-value">{{ memory_usage }}%</div>
+                        </div>
+                        <div class="metric-bar-container">
+                            <div class="metric-bar memory" style="width: {{ memory_usage }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-item">
+                        <div class="metric-header">
+                            <div class="metric-title">Disk Usage</div>
+                            <div class="metric-value">58%</div>
+                        </div>
+                        <div class="metric-bar-container">
+                            <div class="metric-bar disk" style="width: 58%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-item">
+                        <div class="metric-header">
+                            <div class="metric-title">Network Status</div>
+                            <div class="metric-value">Online</div>
+                        </div>
+                        <div class="metric-bar-container">
+                            <div class="metric-bar network" style="width: 92%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-card-header" style="margin-top: 1.5rem;">
+                    <div class="dashboard-card-title">
+                        <i data-feather="clock"></i> Recent Activity
+                    </div>
+                </div>
+                
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon connect">
+                            <i data-feather="log-in"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Connected to <strong>server-01.example.com</strong></div>
+                            <div class="activity-time">Today, 10:45 AM</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon disconnect">
+                            <i data-feather="log-out"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Disconnected from <strong>db-server</strong></div>
+                            <div class="activity-time">Yesterday, 6:30 PM</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon action">
+                            <i data-feather="plus"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Added new connection <strong>web-server</strong></div>
+                            <div class="activity-time">Yesterday, 2:15 PM</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Sessions -->
+    <div class="dashboard-card">
+        <div class="dashboard-card-header">
+            <div class="dashboard-card-title">
+                <i data-feather="zap"></i> Active Sessions
+            </div>
+            <div class="dashboard-card-actions">
+                <a href="{{ url_for('remote.sessions') }}" class="btn">View All</a>
+            </div>
+        </div>
+        
+        <div class="dashboard-card-content">
+            <div id="active-sessions-list">
+                {% if active_sessions > 0 %}
+                    <!-- This would be populated dynamically with JavaScript -->
+                    <div class="connection-item">
+                        <div class="connection-icon">
+                            <i data-feather="terminal"></i>
+                        </div>
+                        <div class="connection-details">
+                            <div class="connection-name">webserver.example.com</div>
+                            <div class="connection-info">
+                                <span><i data-feather="wifi"></i> 192.168.1.10</span>
+                                <span><i data-feather="clock"></i> Connected for 1h 20m</span>
+                                <span><i data-feather="database"></i> 24 MB transferred</span>
+                            </div>
+                        </div>
+                        <div class="connection-actions">
+                            <form action="{{ url_for('remote.disconnect', session_id='sample-id') }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i data-feather="power"></i> Disconnect
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i data-feather="zap-off"></i>
+                        <h3>No Active Sessions</h3>
+                        <p>You don't have any active connections at the moment.</p>
+                        <a href="{{ url_for('remote.connections') }}" class="btn btn-primary">
+                            <i data-feather="link"></i> Connect to a Server
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<!-- Include the data refresh manager -->
+<script src="{{ url_for('static', filename='js/data-refresh.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize feather icons
+    feather.replace();
+    
+    // Initialize the Data Refresh Manager
+    const refreshManager = new DataRefreshManager({
+        defaultInterval: 30000, // 30 seconds
+        endpoints: {
+            // Define each data section that needs refreshing
+            systemStats: {
+                url: '{{ url_for("dashboard.api_system_stats") }}',
+                targetSelector: '.system-metrics',
+                onSuccess: updateSystemMetrics,
+                successMessage: 'System stats updated',
+                errorMessage: 'Failed to update system stats'
+            },
+            activeSessions: {
+                url: '{{ url_for("dashboard.api_active_sessions") }}',
+                targetSelector: '#active-sessions-list',
+                onSuccess: updateActiveSessionsUI,
+                successMessage: 'Active sessions updated',
+                errorMessage: 'Failed to update active sessions'
+            }
+        }
+    });
+    
+    // Update system metrics function
+    function updateSystemMetrics(data) {
+        // Update CPU usage
+        const cpuBar = document.querySelector('.metric-bar.cpu');
+        const cpuValue = document.querySelector('.metric-item:nth-child(1) .metric-value');
+        if (cpuBar && cpuValue && data.system_load !== undefined) {
+            cpuBar.style.width = data.system_load + '%';
+            cpuValue.textContent = data.system_load + '%';
+        }
+        
+        // Update Memory usage
+        const memoryBar = document.querySelector('.metric-bar.memory');
+        const memoryValue = document.querySelector('.metric-item:nth-child(2) .metric-value');
+        if (memoryBar && memoryValue && data.memory_usage !== undefined) {
+            memoryBar.style.width = data.memory_usage + '%';
+            memoryValue.textContent = data.memory_usage + '%';
+        }
+        
+        // Update Disk usage
+        const diskBar = document.querySelector('.metric-bar.disk');
+        const diskValue = document.querySelector('.metric-item:nth-child(3) .metric-value');
+        if (diskBar && diskValue && data.disk_usage !== undefined) {
+            diskBar.style.width = data.disk_usage + '%';
+            diskValue.textContent = data.disk_usage + '%';
+        }
+        
+        // Update Network status
+        const networkBar = document.querySelector('.metric-bar.network');
+        const networkValue = document.querySelector('.metric-item:nth-child(4) .metric-value');
+        if (networkValue && data.network_status !== undefined) {
+            networkValue.textContent = data.network_status;
+            
+            if (data.network_status === 'Online') {
+                networkBar.style.width = '92%';
+            } else {
+                networkBar.style.width = '0%';
+            }
+        }
+    }
+    
+    // Update active sessions UI
+    function updateActiveSessionsUI(data) {
+        const sessions = data.sessions || [];
+        const container = document.getElementById('active-sessions-list');
+        if (!container) return;
+        
+        if (!sessions || sessions.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i data-feather="zap-off"></i>
+                    <h3>No Active Sessions</h3>
+                    <p>You don't have any active connections at the moment.</p>
+                    <a href="{{ url_for('remote.connections') }}" class="btn btn-primary">
+                        <i data-feather="link"></i> Connect to a Server
+                    </a>
+                </div>
+            `;
+            feather.replace();
+            return;
+        }
+        
+        // Build session HTML
+        let html = '';
+        sessions.forEach(session => {
+            let icon = 'terminal';
+            if (session.connection_type === 'rdp' || session.connection_type === 'vnc') {
+                icon = 'monitor';
+            }
+            
+            html += `
+                <div class="connection-item">
+                    <div class="connection-icon">
+                        <i data-feather="${icon}"></i>
+                    </div>
+                    <div class="connection-details">
+                        <div class="connection-name">${session.host}</div>
+                        <div class="connection-info">
+                            <span><i data-feather="wifi"></i> ${session.host}</span>
+                            <span><i data-feather="clock"></i> Connected for ${formatDuration(session.duration)}</span>
+                            <span><i data-feather="database"></i> ${formatBytes(session.data_transferred)} transferred</span>
+                        </div>
+                    </div>
+                    <div class="connection-actions">
+                        <form action="{{ url_for('remote.disconnect', session_id='') }}${session.session_id}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i data-feather="power"></i> Disconnect
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        feather.replace();
+    }
+    
+    // Helper function to format bytes
+    function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+        
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+    
+    // Helper function to format duration
+    function formatDuration(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        
+        if (hours > 0) {
+            return `${hours}h ${minutes}m`;
+        } else {
+            return `${minutes}m`;
+        }
+    }
+});
+</script>
+{% endblock %}

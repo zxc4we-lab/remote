@@ -1,0 +1,232 @@
+:root {
+    /* Dark theme color palette - 2025 Edition */
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --bg-tertiary: #252525;
+    --bg-elevated: #2d2d2d;
+    
+    --text-primary: #e1e1e1;
+    --text-secondary: #a0a0a0;
+    --text-muted: #6c7293;
+    
+    --accent-primary: #7f5af0;
+    --accent-secondary: #2cb67d;
+    --accent-danger: #e53170;
+    --accent-warning: #ffd166;
+    
+    --border-color: #333333;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    
+    /* UI Element Sizes */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    
+    /* Animation */
+    --transition-speed: 0.2s;
+  }
+  
+  /* Base Styles */
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    transition: background-color var(--transition-speed) ease;
+  }
+  
+  /* Layout Components */
+  .container {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  
+  .card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px var(--shadow-color);
+  }
+  
+  /* Navigation */
+  .navbar {
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+  
+  .navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .nav-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--transition-speed) ease;
+    position: relative;
+  }
+  
+  .nav-link:hover {
+    color: var(--text-primary);
+  }
+  
+  .nav-link.active {
+    color: var(--accent-primary);
+  }
+  
+  .nav-link.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    height: 2px;
+    width: 100%;
+    background-color: var(--accent-primary);
+    border-radius: var(--border-radius-sm);
+  }
+  
+  /* Buttons */
+  .btn {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+  }
+  
+  .btn-primary {
+    background-color: var(--accent-primary);
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #6a4cd1;
+  }
+  
+  .btn-secondary {
+    background-color: var(--accent-secondary);
+    color: white;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #269d6b;
+  }
+  
+  .btn-danger {
+    background-color: var(--accent-danger);
+    color: white;
+  }
+  
+  .btn-danger:hover {
+    background-color: #d12a5e;
+  }
+  
+  /* Form Elements */
+  input, select, textarea {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 0.8rem 1rem;
+    width: 100%;
+    transition: border-color var(--transition-speed) ease;
+  }
+  
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent-primary);
+    outline: none;
+  }
+  
+  /* Connection Status Indicators */
+  .status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+  
+  .status-active {
+    background-color: var(--accent-secondary);
+    box-shadow: 0 0 8px var(--accent-secondary);
+  }
+  
+  .status-inactive {
+    background-color: var(--text-muted);
+  }
+  
+  .status-error {
+    background-color: var(--accent-danger);
+    box-shadow: 0 0 8px var(--accent-danger);
+  }
+  
+  /* Remote Terminal */
+  .terminal {
+    background-color: #0d0d0d;
+    border-radius: var(--border-radius-md);
+    padding: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+  }
+  
+  .terminal-text {
+    color: #10ff00;
+  }
+  
+  /* Modern Grid Layout for Dashboard */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  /* Connection Cards */
+  .connection-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .connection-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .navbar-nav {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+  

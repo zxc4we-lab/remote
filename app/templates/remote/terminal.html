@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Terminal - {{ connection.hostname }}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/terminal.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="terminal-header">
+    <div class="connection-info">
+        <h1>
+            <span class="status-indicator status-active"></span>
+            {{ connection.hostname }}
+        </h1>
+        <p>{{ connection.ip_address }}:{{ connection.port }} ({{ connection.connection_type.upper() }})</p>
+    </div>
+    <div class="terminal-actions">
+        <button id="fullscreen-btn" class="btn">
+            <i data-feather="maximize-2"></i>
+        </button>
+        <button id="disconnect-btn" class="btn btn-danger">
+            <i data-feather="power"></i> Disconnect
+        </button>
+    </div>
+</div>
+
+<div class="terminal-container">
+    <div id="terminal" class="terminal">
+        <div id="terminal-output" class="terminal-output">
+            <div class="terminal-text">Connecting to {{ connection.hostname }} ({{ connection.ip_address }})...</div>
+            <div class="terminal-text">Session established. Terminal ready.</div>
+        </div>
+        <div class="terminal-input-line">
+            <span class="terminal-prompt">{{ connection.hostname }}:~$</span>
+            <input type="text" id="terminal-input" class="terminal-input" autofocus>
+        </div>
+    </div>
+</div>
+
+<div class="terminal-info-panel">
+    <div class="info-section">
+        <h3>Session Information</h3>
+        <ul>
+            <li><strong>Session ID:</strong> <span id="session-id">{{ session_id }}</span></li>
+            <li><strong>Connected at:</strong> <span id="connected-time">{{ now.strftime('%H:%M:%S') }}</span></li>
+            <li><strong>Connection Type:</strong> {{ connection.connection_type.upper() }}</li>
+        </ul>
+    </div>
+    <div class="info-section">
+        <h3>Statistics</h3>
+        <ul>
+            <li><strong>Data Transferred:</strong> <span id="data-transferred">0 KB</span></li>
+            <li><strong>Latency:</strong> <span id="latency">-- ms</span></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="{{ url_for('static', filename='js/remote.js') }}"></script>
+<script>
+    // Initialize the terminal connection
+    document.addEventListener('DOMContentLoaded', function() {
+        const socket = io();
+        const sessionId = '{{ session_id }}';
+        const terminalInput = document.getElementById('terminal-input');
+        const terminalOutput = document.getElementById('terminal-output');
+        
+        // Handle input in the terminal
+        terminalInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const command = this.value;
+                
+                // Display the command in the terminal
+                const cmdLine = document.createElement('div');
+                cmdLine.className = 'terminal-text';
+                cmdLine.innerHTML = `<span class="terminal-prompt">{{ connection.hostname }}:~$</span> ${command}`;
+                terminalOutput.appendChild(cmdLine);
+                
+                // Send command to server
+                socket.emit('terminal_input', {
+                    command: command,
+                    session_id: sessionId
+                });
+                
+                // Clear input
+                this.value = '';
+            }
+        });
+        
+        // Listen for terminal output from server
+        socket.on('terminal_output', function(data) {
+            if (data.session_id === sessionId) {
+                const outputLine = document.createElement('div');
+                outputLine.className = 'terminal-text';
+                outputLine.textContent = data.output;
+                terminalOutput.appendChild(outputLine);
+                
+                // Auto-scroll to bottom
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+        });
+        
+        // Handle disconnect button
+        document.getElementById('disconnect-btn').addEventListener('click', function() {
+            socket.emit('disconnect_session', {session_id: sessionId});
+            window.location.href = "{{ url_for('remote.connections') }}";
+        });
+        
+        // Handle fullscreen button
+        document.getElementById('fullscreen-btn').addEventListener('click', function() {
+            const terminal = document.getElementById('terminal');
+            if (terminal.requestFullscreen) {
+                terminal.requestFullscreen();
+            } else if (terminal.mozRequestFullScreen) {
+                terminal.mozRequestFullScreen();
+            } else if (terminal.webkitRequestFullscreen) {
+                terminal.webkitRequestFullscreen();
+            } else if (terminal.msRequestFullscreen) {
+                terminal.msRequestFullscreen();
+            }
+        });
+        
+        // Update statistics periodically
+        setInterval(function() {
+            // This would be replaced with actual data in a real implementation
+            document.getElementById('data-transferred').textContent = 
+                Math.floor(Math.random() * 1000) + ' KB';
+            document.getElementById('latency').textContent = 
+                Math.floor(Math.random() * 100) + ' ms';
+        }, 5000);
+    });
+</script>
+{% endblock %}
